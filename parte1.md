@@ -11,7 +11,7 @@ A página principal do projeto traz uma lista dos Cursos ofertados em uma instit
 ![Visualização da página de cursos](imgs/img1_roteiro.png)
 
 ## 2. Criação do HTML Básico
-Primeiramente, criaremos um documento chamado **index.php**, que deverá conter um elemento **header**, um elemento **main** e um elemento **footer**.
+Primeiramente, criaremos um documento chamado **index.php**, que deverá conter um elemento `<header>`, um elemento `<main>` e um elemento `<footer>`.
 Vamos utilizar o bootstrap. Então, também incluiremos os elementos correspondente à inclusão do CSS e do JS do [Bootstrap](https://getbootstrap.com/).
  A seguir, o conteúdo inicial do `index.php`:
 ```html
@@ -36,9 +36,9 @@ Vamos utilizar o bootstrap. Então, também incluiremos os elementos corresponde
 ```
 
 ## 3. Separando o Cabeçalho e o Rodapé da página
-Para exemplificar o uso da função include() do PHP, colocaremos a parte inicial da página (até o fim do elemento **<headder>**) em um arquivo chamado **cabecalho.html**.
+Para exemplificar o uso da função include() do PHP, colocaremos a parte inicial da página (até o fim do elemento `<header>`) em um arquivo chamado **cabecalho.html**.
 
-Da mesma forma, colocaremos o conteúdo da parte final da página (a partir do início do elemento **<footer>**) em um arquivo chamado **rodape.html**.
+Da mesma forma, colocaremos o conteúdo da parte final da página (a partir do início do elemento `<footer>`) em um arquivo chamado **rodape.html**.
 
 Estas partes que já foram para os outros arquivos serão excluídas do **index.php**. Em seu lugar, utilizaremos a função include(), que fará com que o conteúdo daqueles arquivos seja **incluído** ali.
 
@@ -85,7 +85,7 @@ O conteúdo do arquivo `rodape.html`:
 ## 4. Adicionando um Navbar do Bootstrap
 Para fazer a parte superior da página se comportar como um menu, e já contando com a responsividade, utilizaremos um [navbar](https://getbootstrap.com/docs/5.1/components/navbar/).
 
-No arquivo `cabecalho.html`, dentro da tag **<header>**, acrescente o código que segue (este é um dos exemplos de Navbar do Bootstrap, com algumas modificações nos conteúdos)
+No arquivo `cabecalho.html`, dentro da tag `<header>`, acrescente o código que segue (este é um dos exemplos de Navbar do Bootstrap, com algumas modificações nos conteúdos)
 ```html
 
 ```
