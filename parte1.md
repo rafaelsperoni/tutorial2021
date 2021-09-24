@@ -122,7 +122,7 @@ O arquivo `cabecalho.html`, agora:
 ```
 
 A inclusão do **navbar** faz com que a página index fique com a aparência semelhante à da figura abaixo:
-![Visualização da página de cursos](imgs/img2_roteiro.png)
+![Visualização da página já com o navbar](imgs/img2_roteiro.png)
 
 ## 5. Coloque algum conteúdo no `<main>`
 
@@ -320,6 +320,14 @@ function getCursos(){
 ## 7. A Página `cursos.php`
 
 Agora que já temos um script PHP que contém conjuntos de dados, e uma função que retorna todos os dados de todos os cursos, vamos criar uma página capaz de exibi-los.
+
+Primeiro, criaremos o link no menu. No arquivo `cabecalho.html`, altere o local para onde aponta o link **Cursos**.
+```html
+                  <li class="nav-item">
+                    <a class="nav-link" href="cursos.php">Cursos</a>
+                  </li>
+```
+
 Na pasta `projeto`, crie um arquivo chamado `cursos.php`, que deverá ter o mesmo cabeçalho e o mesmo rodapé utilizados na página inicial. 
 Na verdade, sua estrutura toda é a mesma. O que muda é o conteúdo do elemento `<main>`. Portanto, crie o seu `cursos.php` com a seguinte aparência:
 ```php
@@ -334,7 +342,7 @@ Na verdade, sua estrutura toda é a mesma. O que muda é o conteúdo do elemento
 Observe que trata-se de uma página quase igual à `index.php`.
 
 Agora, queremos apresentar os dados em uma tabela HTML. Então, vamos criar a estrutura básica de uma tabela com 3 colunas.
-Agora o arquivo `cursos.php` ficará assim:
+O arquivo `cursos.php` ficará assim:
 ```php
 <?php
   include('cabecalho.html');
@@ -356,3 +364,30 @@ Agora o arquivo `cursos.php` ficará assim:
   include('rodape.html');
 ?>
 ```
+### Apresentando os dados de cursos
+
+Assim como fizemos com os HTMLs de cabeçalho e rodapé, queremos usar o conteúdo do arquivo `dados.php`.
+Portanto, faremos um novo `include()` no arquivo `cursos.php`.
+```php
+<?php
+  include('cabecalho.html');
+  include('dados.php');
+  ...
+?>
+```
+A seguir, no local onde deixamos o espaço reservado para a exibição dos dados, vamos, inicialmente visualizar o Array inteiro.
+O comando `echo()` não é capaz de exibir o conteúdo de um Array. Portanto, apenas para fins de teste, utilizaremos a função `print_r()` para exibir o conteúdo do Array, ainda que de forma rudimentar.
+No arquivo `cursos.php`, no corpo da tabela:
+```php
+...
+          <tbody>
+              <!-- Aqui vão as linhas com os dados -->
+              <?php
+                $cursos = getCursos();
+                print_r($cursos);
+              ?>
+          </tbody>
+...          
+``` 
+Acessando em seu navegador a página `cursos.php`, verá algo como:
+![Visualização da página cursos com os dados do Array](imgs/img3_roteiro.png)
