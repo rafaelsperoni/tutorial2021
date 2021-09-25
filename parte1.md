@@ -439,4 +439,4 @@ A tabela contida em `cursos.php` será gerada da seguinte forma:
 ```
 Veja que, para cada `$curso` (cada repetição), será gerada uma **linha da tabela** `<tr>`, com **3 células** `<td>`. Dentro de cada célula um dos dados (id, nome e semestres) do curso.
 Acessando novamente a página `cursos.php` no navegador:
-![Visualização da página cursos com os dados em uma tabela](imgs/img4_roteiro.png)
+![Visualização da página cursos com os dados em uma tabela](imgs/img5_roteiro.png)
