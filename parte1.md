@@ -389,5 +389,54 @@ No arquivo `cursos.php`, no corpo da tabela:
           </tbody>
 ...          
 ``` 
+A variável `$cursos` vai receber o conteúdo retornado pela função `getCursos()` (o Array contendo os dados de cursos).
+Em seguida, a função `print_r()` apresenta o conteúdo deste Array.
+
 Acessando em seu navegador a página `cursos.php`, verá algo como:
 ![Visualização da página cursos com os dados do Array](imgs/img3_roteiro.png)
+
+Bem, já vimos que os dados estão disponíveis na página `cursos.php`, na forma de um Array chamado `$cursos`.
+Agora, vamos percorrer este Array, usando um `foreach()`.
+Lembrando que o `foreach()` é um "para cada". Assim, vamos fazer uma ação se repetir **"para cada"** um dos itens do Array `cursos.
+
+```php
+          <tbody>
+              <!-- Aqui vão as linhas com os dados -->
+              <?php
+                $cursos = getCursos();
+                foreach($cursos as $curso){
+                    print_r($curso);
+                }
+              ?>
+          </tbody>
+```
+Veja que no `foreach()` estamos dizendo algo como: **"para cada item de `$cursos`, chame-o de `$curso`, e faça"**.
+Dentro da repetição estamos exibindo o Array `$curso`, que assumirá o valor de cada posição que estiver sendo percorrida.
+
+Execute novamente a página `cursos.php` no navegador:
+![Visualização da página cursos com os dados de cada Array](imgs/img4_roteiro.png)
+
+Parece a mesma coisa, mas não é. Veja que antes tinhamos Arrays dentro de um Array. Agora estamos exibindo cada um dos Arrays que estavam dentro de `$cursos`.
+
+Por fim, vamos apresentar os dados na forma de uma linha da tabela. Para isto, nosso PHP vai gerar trechos de HTML.
+A tabela contida em `cursos.php` será gerada da seguinte forma:
+```php
+        ...
+          <tbody>
+              <!-- Aqui vão as linhas com os dados -->
+              <?php
+                $cursos = getCursos();
+                foreach($cursos as $curso){
+                    echo ("<tr>
+                            <td>".$curso['id']."</td>
+                            <td>".$curso['nome']."</td>
+                            <td>".$curso['semestres']."</td>
+                           </tr>");
+                }
+              ?>
+          </tbody>
+          ...
+```
+Veja que, para cada `$curso` (cada repetição), será gerada uma **linha da tabela** `<tr>`, com **3 células** `<td>`. Dentro de cada célula um dos dados (id, nome e semestres) do curso.
+Acessando novamente a página `cursos.php` no navegador:
+![Visualização da página cursos com os dados em uma tabela](imgs/img4_roteiro.png)
