@@ -440,3 +440,8 @@ A tabela contida em `cursos.php` será gerada da seguinte forma:
 Veja que, para cada `$curso` (cada repetição), será gerada uma **linha da tabela** `<tr>`, com **3 células** `<td>`. Dentro de cada célula um dos dados (id, nome e semestres) do curso.
 Acessando novamente a página `cursos.php` no navegador:
 ![Visualização da página cursos com os dados em uma tabela](imgs/img5_roteiro.png)
+
+## 8. Teste - Adicione outro curso aos dados
+Agora, como teste, adicione mais um curso aos dados.
+Vá até o arquivo `dados.php`, localize o Array `$cursos`, e adicione outro curso (observe a estrutura do Array e faça semelhante).
+Depois acesse novamente a sua página, e veja que a lista de cursos aumentou.
