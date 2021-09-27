@@ -457,7 +457,7 @@ Agora que já conseguimos exibir os dados dos cursos na página, vamos mostrar, 
 
 Observe, ainda, que há um Array `$professores`, que contém os dados dos professores, entre eles seu `id` e `nome`. Vamos usar o nome correspondente.
 
-### 10.1 Mostrando o id do Coordenador
+### 10.1. Mostrando o id do Coordenador
 
 Acrescente mais uma coluna à tabela.
 ```html
@@ -486,3 +486,46 @@ Acrescente, também uma coluna na exibição dos dados de curso, mostrando o id 
 ```
 Verifique em seu navegador, e sua página `cursos.php` deverá estar semelhante à imagem:
 ![Tabela já co o código do coordenador](imgs/img6_roteiro.png)
+
+### 10.2. Uma função para retornar o Professor
+
+Agora, criaremos uma função que receberá um `$id` e retornará os dados do professor correspondente no Array `$professores`.
+No arquivo `dados.php`:
+```php
+//recebe um id, e retorna um Array com os dados do professor correspondente
+function getProfessor($id){
+    //usa a variável $professores (que é global)
+    global $professores;
+    //percorre o array
+    foreach($professores as $professor){
+        //testa se o valor contido na posição id é o mesmo passado por parâmetro
+        if($professor['id'] == $id){
+            //se for, retorna o Array $professor (que contem id e nome do professor)
+            return $professor;
+        }
+    }
+}
+```
+
+### 10.3. Trazendo o nome do professor para a página
+
+Como nossa página já exibe o id do coordenador, vamos utilizar este valor para chamar a função `getProfessor()`.
+Assim, na página `cursos.php`, teremos:
+```php
+              <?php
+                $cursos = getCursos();
+                foreach($cursos as $curso){
+                    echo ("<tr>
+                            <td>".$curso['id']."</td>
+                            <td>".$curso['nome']."</td>
+                            <td>".$curso['semestres']."</td>");
+                    //pega o id do coordenador do curso
+                    $idCoord = $curso['coordenador'];
+                    //busca os dados do professor e armazena em $coordenador (retorna um array)
+                    $coordenador = getProfessor($idCoord);
+                    //exibe o nome do coordenador na coluna da tabela
+                    echo (" <td>".$coordenador['nome']."</td>
+                           </tr>");
+                }
+              ?>
+```
