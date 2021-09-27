@@ -532,3 +532,152 @@ Assim, na página `cursos.php`, teremos:
 
 Agora, a página `cursos.php` traz os nomes dos Coordenadores:
 ![Tabela já com o nome do coordenador](imgs/img7_roteiro.png)
+
+## 11. Uma página para exibir os dados de Professores
+Agora, vamos criar uma página para exibir os dados de um professor.
+Esta página, exibirá, basicamente o id e o nome do Professor selecionado.
+Trata-se, portanto, de uma única página, onde os dados de qualquer professor pode ser exibido da mesma forma, sendo apenas seus dados as variáveis.
+
+Para tanto, utilizaremos de um recurso do HTTP, chamado `Query string`.
+### 11.1. Query String
+Uma **query string** é uma parte de uma URL (uniform resource locator), que atribui valores a parâmetros.
+Em outras palavras, é uma forma de passar valores como parâmetros em URLs.
+
+Desta forma, se tivermos uma página `http://localhost/projeto/professor.php`, e desejarmos passar um valor como parâmetro na URL, podemos fazer algo como: `http://localhost/projeto/professor.php?id=1`, onde `id=1` trata-se de um par 'chave-valor' **(algo como variável id vale 1)**.
+
+Isso permite que, ao carregar a página, os valores passados na **Query String** sejam recuperados e utilizados como entrada para o algoritmo PHP a ser rodado naquela página.
+
+Por exemplo, podemos criar a página `professor.php`, que exibe os dados de qualquer professor, dado o seu `id`. E podemos esperar que o valor desse `id`seja passado via **query string**.
+Dessa forma, acessando `http://localhost/projeto/professor.php?id=1`, a página exibirá os dados do professor com id=1. Acessando `http://localhost/projeto/professor.php?id=2`, a página exibirá os dados do professor com id=2.
+
+### 11.2. A página professor.php
+
+A página `professor.php` também terá a mesma estrutura das demais. Portanto, ela utilizará o mesmo cabeçalho e o mesmo rodapé das demais, e podemos fazer isso por meio de includes.
+O arquivo `professor.php` será iniciado assim:
+```php
+<?php
+include ('cabecalho.html');
+include ('dados.php');
+?>
+<main>
+    <h2>Professor</h2>
+</main>
+<?php
+include ('rodape.html');
+?>
+```
+Em PHP, uma forma de recuperarmos os valores passados via **query string** é pela variável super global **$_GET**, criada automaticamente pelo PHP.
+Portanto, quando acessamos `http://localhost/projeto/professor.php?id=1`, o par **chave-valor** id=1 estará dentro do Array **$_GET**.
+
+Modifique o seu arquivo `professor.php`, acrescentando um `print_r()` para exibir o conteúdo de `$_GET`:
+```php
+<?php
+include ('cabecalho.html');
+include ('dados.php');
+?>
+<main class="container">
+<?php
+    //exibe o conteúdo do Array $_GET
+    print_r($_GET);
+?>
+    <h2>Professor</h2>
+</main>
+<?php
+include ('rodape.html');
+?>
+```
+Agora, acessando em seu navegador `http://localhost/.../professor.php?id=1` (verifique o seu caminho correto), temos:
+![Conteúdo de $_GET na página professores.php](imgs/img8_roteiro.png)
+
+Perceba que o conteúdo de `$_GET` é um array, criado automaticamente pelo PHP, que contem uma posição `id`, com valor 1. Isso veio da **query string**.
+Mude, agora a URL para `http://localhost/.../professor.php?id=2` e observe o resultado.
+
+Isso signific que podemos utilizar este valor para buscar os dados do professor correspondente, com a função `getProfessor()`.
+
+Como já fizemos o `include('dados.php')`, podemos utilizar os dados e as funções contidas naquele arquivo.
+
+Façamos o teste, em `professor.php`:
+```php
+<main class="container">
+    <h2>Professor</h2>
+    <?php
+    //exibe o conteúdo do Array $_GET
+    print_r($_GET);
+    //recuperamos o valor da posição id
+    $id = $_GET['id'];
+    //buscamos os dados do professor com aquele id
+    $professor = getProfessor($id);
+    //exibindo o conteúdo do array $professor
+    print_r($professor);
+?>
+</main>
+```
+Se acessarmos `http://localhost/.../professor.php?id=5`, teremos:
+
+![Dados do Array $professores na página professor.php](imgs/img9_roteiro.png)
+
+#### 11.2.1. Apresentando os dados do professor corretamente
+
+Vamos remover os `print_r()`, e melhorar a apresentação dos dados.
+Já vimos que temos um Array `$professor`, que contém os dados do professor selecionado, então vamos usá-lo para apresentar os dados.
+O novo código para a parte principal da página `professor.php`:
+```php
+<main class="container">
+    <h2>Dados do Professor</h2>
+    <?php
+    //exibe o conteúdo do Array $_GET
+   // print_r($_GET);
+    //recuperamos o valor da posição id
+    $id = $_GET['id'];
+    //buscamos os dados do professor com aquele id
+    $professor = getProfessor($id);
+    //exibindo o conteúdo do array $professor
+   // print_r($professor);
+   echo ('<dl>
+            <dt>'.$professor['nome'].'</dt>
+            <dd>Este é o professor com id='.$professor['id'].'</dd>
+          </dl>');
+?>
+</main>
+```
+
+#### 11.2.2 Criando um link no nome do professor
+Como já temos uma página que exibe os dados de um professor, dependendo de seu `id`, e sabemos que iremos passar o valor deste `id`via **query string**, precisamos criar hyperlinks para levar a esta página.
+
+O que queremos é que cada nome de Coordenador seja um hyperlink, que aponte para a página `professor.php?id=x`, onde `x` é o seu id.
+
+Cada queremos algo como:
+```html
+    <a href="professores.php?id=1">André Moraes</a>
+    <a href="professores.php?id=2">Ângelo Frozza</a>
+    <a href="professores.php?id=3">Daniel Anderle</a>
+    <a href="professores.php?id=4">Daniel Varela</a>
+    <a href="professores.php?id=5">Rafael Speroni</a>
+    <a href="professores.php?id=6">Lidiane Visintin</a>
+```
+Observe que, são links iguais. O que muda em cada linha é o valor do id e o nome do professor.
+
+Veja que em `cursos.php` os nomes dos professores já são apresentados. Precisamos mudar a forma como será escrito. Em vez de um texto simples, um hyperlink.
+Em `cursos.php`, teremos:
+```php
+...
+                    //pega o id do coordenador do curso
+                    $idCoord = $curso['coordenador'];
+                    //busca os dados do professor e armazena em $coordenador (retorna um array)
+                    $coordenador = getProfessor($idCoord);
+                    //exibe o nome do coordenador na coluna da tabela
+                    echo (" <td><a href='professor.php?id=".$coordenador['id']."'>".$coordenador['nome']."</a></td>
+                           </tr>");
+                }
+...
+```
+Observe que, para cada curso, o nome do Coordenador é criado dentro de um `<a href>...</a>`, transformando-o em um link. Observe, também, que o `coordenador['id']` é passado na **query string**.
+Acessando a página `cursos.php`, temos:
+![Página cursos com links para professor](imgs/img10_roteiro.png)
+
+#### 11.2.3 TAREFA - Mais dados para os professores.
+Como tarefa, para cada professor, acrescente um e-mail e um telefone (no Array `$professores`).
+Agora, faça com que a página `professores.php` apresente, também, estes dados.
+
+## 12. TAREFA - Uma página para exibir os dados de um Curso
+Como tarefa, 
