@@ -453,9 +453,9 @@ Para a tabela, utilizaremos `<table class="table table-striped">`, que faz com q
 
 ## 10. Acrescentando o nome do Coordenador do Curso
 
-Agora que já conseguimos exibir os dados dos cursos na página, vamos mostrar, também, o nome do Coordenador. Veja que no Array `$cursos` não temos o nome do coordenador, e sim um valor `id_coordenador`.
+Agora que já conseguimos exibir os dados dos cursos na página, vamos mostrar, também, o nome do Coordenador. Veja que no Array `$cursos` não temos o nome do coordenador, e sim um valor numérico `coordenador`, que representa o `id` do professor correspondente (a ideia aqui é simular uma chave estrangeira).
 
-Observe, ainda, que há um Array `$professores`, que contém os dados dos professores, entre eles seu `id` e `nome`.
+Observe, ainda, que há um Array `$professores`, que contém os dados dos professores, entre eles seu `id` e `nome`. Vamos usar o nome correspondente.
 
 ### 10.1 Mostrando o id do Coordenador
 
@@ -479,8 +479,10 @@ Acrescente, também uma coluna na exibição dos dados de curso, mostrando o id 
                             <td>".$curso['id']."</td>
                             <td>".$curso['nome']."</td>
                             <td>".$curso['semestres']."</td>
-                            <td>".$curso['id_coordenador']."</td>
+                            <td>".$curso['coordenador']."</td>
                            </tr>");
                 }
               ?>
 ```
+Verifique em seu navegador, e sua página `cursos.php` deverá estar semelhante à imagem:
+![Tabela já co o código do coordenador](imgs/img6_roteiro.png)
