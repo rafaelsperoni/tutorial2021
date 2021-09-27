@@ -675,9 +675,20 @@ Observe que, para cada curso, o nome do Coordenador é criado dentro de um `<a h
 Acessando a página `cursos.php`, temos:
 ![Página cursos com links para professor](imgs/img10_roteiro.png)
 
-#### 11.2.3 TAREFA - Mais dados para os professores.
-Como tarefa, para cada professor, acrescente um e-mail e um telefone (no Array `$professores`).
+Teste os links. Cada um deles deverá apontar para a página `professor.php` com um valor diferente para `id` na **query string**.
+
+## 12 TAREFAS 
+
+### 12.1. - Mais dados para os professores
+Como tarefa, para cada professor, acrescente um **e-mail** e um **telefone** (no Array `$professores`).
 Agora, faça com que a página `professores.php` apresente, também, estes dados.
 
-## 12. TAREFA - Uma página para exibir os dados de um Curso
-Como tarefa, 
+### 12.2. Uma página para exibir os dados de um Curso
+Como tarefa, faça para curso o mesmo que foi feito com professor. Ou seja:
+#### Cada nome de curso deverá ser um link para `curso.php?id=x`
+Ao clicar em um curso, queremos que vá para uma página chamada `curso.php`, que apresentará os detalhes do curso.
+#### Criar em `dados.php` uma função `getCurso($id)`
+A função deverá receber um valor de `$id` e retornar o Array contendo os dados do curso co id correspondente.
+
+#### Criar uma página `curso.php`
+A página `curso.php` receberá um `id` via **query string** e apresentará os dados daquele curso correspondente (usando a função recém criada `getCurso()`).
