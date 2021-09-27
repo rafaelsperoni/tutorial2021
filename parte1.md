@@ -529,3 +529,6 @@ Assim, na página `cursos.php`, teremos:
                 }
               ?>
 ```
+
+Agora, a página `cursos.php` traz os nomes dos Coordenadores:
+![Tabela já com o nome do coordenador](imgs/img7_roteiro.png)
