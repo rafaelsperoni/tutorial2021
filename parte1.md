@@ -445,3 +445,42 @@ Acessando novamente a página `cursos.php` no navegador:
 Agora, como teste, adicione mais um curso aos dados.
 Vá até o arquivo `dados.php`, localize o Array `$cursos`, e adicione outro curso (observe a estrutura do Array e faça semelhante).
 Depois acesse novamente a sua página, e veja que a lista de cursos aumentou.
+
+## 9. Acrescente algumas classes para ajustar o Layout
+Como estamos usando o CSS do Bootstrap, podemos fazer alguns ajustes básicos, utilizando algumas classes.
+Utilizaremos `<main class="container">`, isto fará com que o elemento `<main>` ganhe um posicionamento e margens.
+Para a tabela, utilizaremos `<table class="table table-striped">`, que faz com que as linhas tenham cores alternadas.
+
+## 10. Acrescentando o nome do Coordenador do Curso
+
+Agora que já conseguimos exibir os dados dos cursos na página, vamos mostrar, também, o nome do Coordenador. Veja que no Array `$cursos` não temos o nome do coordenador, e sim um valor `id_coordenador`.
+
+Observe, ainda, que há um Array `$professores`, que contém os dados dos professores, entre eles seu `id` e `nome`.
+
+### 10.1 Mostrando o id do Coordenador
+
+Acrescente mais uma coluna à tabela.
+```html
+      <table class="table table-striped">
+          <thead>
+              <th>Id</th>
+              <th>Nome</th>
+              <th>Semestres</th>
+              <th>Coordenador</th>
+          </thead>
+...
+```
+Acrescente, também uma coluna na exibição dos dados de curso, mostrando o id do Coordenador.
+```php
+              <?php
+                $cursos = getCursos();
+                foreach($cursos as $curso){
+                    echo ("<tr>
+                            <td>".$curso['id']."</td>
+                            <td>".$curso['nome']."</td>
+                            <td>".$curso['semestres']."</td>
+                            <td>".$curso['id_coordenador']."</td>
+                           </tr>");
+                }
+              ?>
+```
