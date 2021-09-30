@@ -688,7 +688,7 @@ Como tarefa, faça para curso o mesmo que foi feito com professor. Ou seja:
 #### Cada nome de curso deverá ser um link para `curso.php?id=x`
 Ao clicar em um curso, queremos que vá para uma página chamada `curso.php`, que apresentará os detalhes do curso.
 #### Criar em `dados.php` uma função `getCurso($id)`
-A função deverá receber um valor de `$id` e retornar o Array contendo os dados do curso co id correspondente.
+A função deverá receber um valor de `$id` e retornar o Array contendo os dados do curso co id correspondente. 
 
 #### Criar uma página `curso.php`
 A página `curso.php` receberá um `id` via **query string** e apresentará os dados daquele curso correspondente (usando a função recém criada `getCurso()`).
