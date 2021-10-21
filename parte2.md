@@ -229,9 +229,8 @@ function buscaCursos(){
                 let textnome = document.createTextNode(curso.nome); //cria um nó de texto
                 tabelaCursos.appendChild(textNome); //adiciona o nó de texto dentro do elemento #tabelaCursos
             })
-        }); 
-    })
-    .catch(err => console.error(err)); //caso dê erro, mostra no console
+        }) 
+        .catch(err => console.error(err)); //caso dê erro, mostra no console
 }
 ```
 
