@@ -203,7 +203,5 @@ Dentro desta pasta, crie os arquivos de seu projeto.
 
 ## 2. Editor de códigos
 
-Como sugestão, utilize, para seu projeto o editor Visual Studio (vscode).
-
-### 2.1. Instalação do VSCode
+Escolha um editor de sua preferência, instale e abra a pasta de seu projeto, e passe à [Parte 1](parte1.md) do Tutorial.
 
