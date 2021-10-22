@@ -1,4 +1,4 @@
-# Parte 2
+ Parte 2
 
 Na Parte 1, fizemos uma primeira versão de uma página com conteúdo dinâmico, cujos dados estavam armazenados em Arrays.
 As páginas dinâmicas foram geradas pelo PHP, que construiu o HTML e fez o envio dos conetúdos "prontos" para o cliente.
@@ -278,3 +278,159 @@ A imagem abaixo apresenta os nomes dentro da tabela, cada um em uma linha (obser
 ![Inclusão dos nomes de curso nas linhas da tabela](imgs/img17_roteiro.png)
 
 Na sequência, é necessário criar mais células, uma para id, uma para semestres, e uma para o coordenador.
+
+### 2.3.1. Adicionando as outras colunas (id, semestres e coordenador)
+
+Da mesma forma como fizemos com o nome do curso, desejamos que cada linha da tabela contenha 4 colunas. Assim, precisamos incluir uma célula (`<td>`) antes daquela que criamos para o nome do curso. Considerando que os dados retornados em JSON trazem todos os dados de todos os cursos, devemos lembrar que:
+* os dados retornados em json estão em um array;
+* cada posição desse array contém um objeto, que representa cada curso;
+* em um `foreach`, acessamos o nome do curso na propriedade `curso.nome`;
+
+Portanto, temos disponíveis, ainda, `curso.id`, `curso.semestres` e `curso.coordenador`.
+
+Vamos alterar a função `buscaCursos()` no arquivo `cursos.js`. Dentro do `foreach()` dessa função, teremos, então:
+
+```javascript
+...
+                //DOM - Document Object Model
+                let tr = document.createElement("tr");
+                //cria uma célula para o id, dentro dela um nó de texto, e dentro do nó um valor - adiciona célula na linha
+                let tdid = document.createElement("td");
+                let textid = document.createTextNode(curso.id);
+                tdid.appendChild(textid);
+                tr.appendChild(tdid);
+
+                //cria uma célula para o id, dentro dela um nó de texto, e dentro do nó um valor - adiciona célula na linha
+                let tdnome = document.createElement("td");
+                let textnome = document.createTextNode(curso.nome);
+                tdnome.appendChild(textnome);
+                tr.appendChild(tdnome);
+
+                //cria uma célula para o id, dentro dela um nó de texto, e dentro do nó um valor - adiciona célula na linha
+                let tdsemestres = document.createElement("td");
+                let textsemestres = document.createTextNode(curso.semestres);
+                tdsemestres.appendChild(textsemestres);
+                tr.appendChild(tdsemestres);
+
+                //cria uma célula para o id, dentro dela um nó de texto, e dentro do nó um valor - adiciona célula na linha
+                let tdcoord = document.createElement("td");
+                let textcoord = document.createTextNode(curso.coordenador);
+                tdcoord.appendChild(textcoord);
+                tr.appendChild(tdcoord);
+
+                //adiciona a linha na tabela
+                tabelacursos.appendChild(tr);
+...
+```
+
+Com estas alterações, a página ficou conforme apresenta a figura:
+![Inclusão dos nomes de curso nas linhas da tabela](imgs/img18_roteiro.png)
+
+## 2.4. Melhorando a qualidade dos dados
+
+Vimos que foi possível retornar, como JSON, os dados dos cursos. Todavia, percebemos que trouxemos apenas o **id** do coordenador. O nome deste professor está em outro conjunto de dados.
+
+Podemos melhorar os dados a serem retornados em nosso JSON do `dadoscursos.php`, de tal forma que já tragam também o nome do professor coordenador.
+
+Em outras palavras, queremos que o JSON a ser retornado traga elementos um pouco mais complexos.
+Em vez de termos o JSON assim:
+
+```javascript
+[
+...
+    {
+        "id":1,
+        "nome":"Tecnologia em Sistemas para Internet",
+        "semestres":6,
+        "coordenador":5
+    },
+    {
+        "id":2,
+        "nome":"Bacharelado em Sistemas de Informação",
+        "semestres":8,
+        "coordenador":3
+    },
+    {
+        "id":3,
+        "nome":"Técnico em Informática Integrado",
+        "semestres":6,
+        "coordenador":2
+    }
+...
+]
+```
+
+Queremos um JSON assim, onde a propriedade `coordenador` de cada curso contenha um **objeto** com os dados do professor.
+
+```javascript
+[
+...
+    {
+        "id":1,
+        "nome":"Tecnologia em Sistemas para Internet",
+        "semestres":6,
+        "coordenador":{
+            "id":5,
+            "nome":"Rafael Speroni"
+        }
+    },
+    {
+        "id":2,
+        "nome":"Bacharelado em Sistemas de Informação",
+        "semestres":8,
+        "coordenador":{
+            "id":3,
+            "nome":"Daniel Anderle"
+        }
+    },
+    {
+        "id":3,
+        "nome":"Técnico em Informática Integrado",
+        "semestres":6,
+        "coordenador":{
+            "id":2,
+            "nome":"Ângelo Frozza"
+        }
+    }
+...
+]
+```
+Desta forma, vamos alterar a função `getCursos()` em `api/dadoscursos.php`, de forma que ela retorne um Array modificado, mais completo, com os dados dos professores.
+
+## 2.4.1. Alterando a funçao getCursos()
+
+Vamos alterar essa função, fazendo com que o Array de cursos a ser retornado passe a conter, em vez de apenas o **id** do coordenador, um **objeto** contendo os dados do professor coordenador.
+
+No arquivo `dados.php`, vamos percorrer o Array `$cursos`, e alterar o valor da propriedade `coordenador` de cada curso. Vamos guardar nessa posição o Array do professor correspondente:
+
+```php
+function getCursos(){
+    global $cursos; //a funcao passa a "conhecer" a variavel definida fora
+    //percorre cada posição do array
+    for($i=0; $i<sizeof($cursos); $i++){
+        //busca o professor correspondente, recebe o Array
+        $coordenador = getProfessor($cursos[$i]['coordenador']);
+        //substitui o valor da posição coordenador pelo Array
+        $cursos[$i]['coordenador'] = $coordenador;
+    }    
+    return $cursos;
+}
+```
+Observe agora, no inspector, a requisição que é feita para `api/dadoscursos.php`, e veja que o JSON retornado na requisição está modificado, sendo que `coordenador` não tem apenas um **id**, e sim um **Objeto** que contem **id** e **nome** do professor.
+![json alterado](imgs/img19_roteiro.png)
+
+Podemos, então, alterar a função `buscaCursos()` em `cursos.js`, de forma a alterar o que é exibido na última coluna da tabela.
+
+Antes, exibiamos `curso.coordenador`. Agora, essa propriedade contém um **Objeto**, que tem propriedade **id** e **nome**. Desejamos mostrar o nome, que está em `curso.coordenador.nome`:
+```javascript
+// cursos.js
+// função buscaCursos()
+...
+                let tdcoord = document.createElement("td");
+                let textcoord = document.createTextNode(curso.coordenador.nome);
+                tdcoord.appendChild(textcoord);
+                tr.appendChild(tdcoord);
+...
+```
+
+E, então, a página `cursos.php` será apresentada conforme segue:
