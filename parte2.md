@@ -434,3 +434,4 @@ Antes, exibiamos `curso.coordenador`. Agora, essa propriedade contém um **Objet
 ```
 
 E, então, a página `cursos.php` será apresentada conforme segue:
+![Página com professores](imgs/img20_roteiro.png)
