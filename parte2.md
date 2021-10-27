@@ -115,7 +115,7 @@ Isto indica que o seu JavaScript está funcionando, ou seja, que ao terminar de 
 
 Uma vez que o JS está executando, vamos às requisições.
 
-## 2.1. Criando uma função JS para requisição dos dados de Cursos
+### 2.1. Criando uma função JS para requisição dos dados de Cursos
 
 Já temos:
 - Script php `api/dadoscursos.php` que retorna os dados dos cursos em JSON;
@@ -169,7 +169,7 @@ Isto indica que houve uma requisição (verifique a aba Network - ou Rede do Nav
 
 O próximo passo é percorrer estes dados, e manipular o documento HTML, incluindo elementos e os dados na forma de linhas de uma tabela.
 
-## 2.2. Manipulando os dados e exibindo no console com JS
+### 2.2. Manipulando os dados e exibindo no console com JS
 
 Agora, nossa função de busca dos dados, será responsável por fazer a manipulação dos dados recebidos, e acrescentá-los à página HTML `cursos.php`.
 
@@ -204,7 +204,7 @@ Acessando o console em seu navegador, terá algo como:
 
 ![Visualização o nome de cada curso no console](imgs/img15_roteiro.png)
 
-## 2.3. Exibindo os dados na Página com JS
+### 2.3. Exibindo os dados na Página com JS
 
 Já conseguimos exibir os dados no console. Para exibir na página, precisaremos manipular os elementos HTML. Para isto, utilizaremos o DOM (Document Object Model). Com DOM, um documento HTML é visto como um conjunto de objetos estruturados de forma hierárquica, de tal forma que podemos recuperar ou incluir elementos, atributos, textos, em qualquer ponto de um documento.
 
@@ -326,7 +326,7 @@ Vamos alterar a função `buscaCursos()` no arquivo `cursos.js`. Dentro do `fore
 Com estas alterações, a página ficou conforme apresenta a figura:
 ![Inclusão dos nomes de curso nas linhas da tabela](imgs/img18_roteiro.png)
 
-## 2.4. Melhorando a qualidade dos dados
+### 2.4. Melhorando a qualidade dos dados
 
 Vimos que foi possível retornar, como JSON, os dados dos cursos. Todavia, percebemos que trouxemos apenas o **id** do coordenador. O nome deste professor está em outro conjunto de dados.
 
@@ -397,7 +397,7 @@ Queremos um JSON assim, onde a propriedade `coordenador` de cada curso contenha 
 ```
 Desta forma, vamos alterar a função `getCursos()` em `api/dadoscursos.php`, de forma que ela retorne um Array modificado, mais completo, com os dados dos professores.
 
-## 2.4.1. Alterando a funçao getCursos()
+#### 2.4.1. Alterando a funçao getCursos()
 
 Vamos alterar essa função, fazendo com que o Array de cursos a ser retornado passe a conter, em vez de apenas o **id** do coordenador, um **objeto** contendo os dados do professor coordenador.
 
@@ -435,3 +435,77 @@ Antes, exibiamos `curso.coordenador`. Agora, essa propriedade contém um **Objet
 
 E, então, a página `cursos.php` será apresentada conforme segue:
 ![Página com professores](imgs/img20_roteiro.png)
+
+## 3. A página de professor.php
+
+Tal qual fizemos com a página que lista os cursos, vamos alterar a página `professor.php`, de forma que o PHP a página seja carregada em sua estrutura básica, e os dados sejam carregados por meio de uma requisição AJAX, usando o `fetch()`.
+
+### 3.1. Criação do link no nome do professor
+
+Queremos fazer com que os nomes dos professores, na página `cursos.php`, sejam transformados em links. Todavia, temos que observar que, nesta versão da página os conteúdos da tabela foram gerados via Javascript, pela manipulação do DOM, ou seja, a criação dos elementos e seu posicionamento no documento foi feito na função Javascript `buscaCursos()` no `cursos.js`.
+
+Queremos alterar o conteúdo da célula (`<td>`) correspondente ao nome do Coordenador do curso, acrescentando um link (`<a href>`).
+
+```javascript
+...
+                let tdcoord = document.createElement("td");
+                let linkcoord = document.createElement("a");
+                let textcoord = document.createTextNode(curso.coordenador.nome);
+                linkcoord.appendChild(textcoord);
+                linkcoord.setAttribute("href", "#");
+                linkcoord.setAttribute("onclick", "pagProfessor(this)");
+                linkcoord.setAttribute("data-coord", curso.coordenador.id);
+                tdcoord.appendChild(linkcoord);
+                tr.appendChild(tdcoord);
+...                
+```
+Descrevendo o código, temos:
+* criação do elemento célula (`<td>`), que chamaremos `tdcoord`;
+* criação do elemento link (`<a>`), que chamaremos `linkcoord`;
+* criação do "nó de texto", que chamaremos `textcoord`, contendo o valor do nome a exibir;
+* adiciona o `textcoord` dentro do `linkcoord`, fazendo com que crie algo como `<a>Rafael Speroni</a>`;
+* adiciona um atributo `href="#"` ao `linkcood`, fazendo com que crie algo como `<a href="#">Rafael Speroni</a>`;
+* adiciona um atributo `data-coord` com o valor do id do professor ao `linkcoord`, fazendo com que se crie algo como `<a href="#" data-coord="1">Rafael Speroni</a>`; 
+* adiciona um atributo `onclick="buscaProfessor(this)"`, fazendo com que se crie algo como `<a href="#" data-coord="1" onclick="buscaProfessor(this)">Rafael Speroni</a>`;
+* adiciona o link `linkcoord` à celula `tdcoord`;
+* adiciona a célula `tdcoord` à linha da tabela `<tr>`;
+
+Isto fará com que o nome do professor seja exibido na forma de uma **célula da tabela (td)**, que contém um link **<a>**, que aponta para a própria página **href="#"**, que ao ser clicado chama uma função **buscaProfessor(this)**, e que tem o id do professor armazenado no atributo **data-coord**;
+
+Visualize sua página no navegador, e verifique se os links foram criados. Inspecione o elemento do nome, e verifique se o HTML foi gerado corretamente, conforme exemplo da figura abaixo:
+![Página com professores com links](imgs/img21_roteiro.png)
+
+Uma vez que tenha criado os links, eles ainda não funcionam. Observe no console javascript que o erro indica que a função `buscaProfessor()` não está definida. De fato, ainda não foi criada.
+![Erro JS - função não definida](imgs/img22_roteiro.png)
+
+### 3.2. Criação do script api/dadosprofessores.php
+
+Este é um arquivo PHP que faz papel de backend. Ao receber uma requisição GET, com um id de professor, retornará um JSON com os dados do referido professor.
+
+Na pasta `api`, crie o `dadosprofessores.php`
+```php
+<?php
+include('../dados.php'); //para que acesse as funções e os dados
+
+if(isset($_GET['id'])){
+    echo json_encode(getProfessor($_GET['id']));
+}else{
+    echo "id não definido";
+}
+```
+Neste primeiro momento, o script somente funcionará para os casos em que seja enviado um **id** de professor no **queryString**. Por exemplo, teríamos uma requisição para algo como `http://localhost/..../api/dadosprofessores.php?id=1`;
+
+Portanto, o que fazemos é testar se há um valor de **id** enviado na **queryString**. Caso afirmativo, chamamos a função `getProfessor()`, que está definida em `dados.php`, e exibimos o seu retorno, codificando em JSON.
+
+Desta forma, se testarmos o acesso direto ao link `http://localhost/..../api/dadosprofessores.php?id=1`, teremos como resposta o JSON com os dados de um professor, tal qual exemplificado na imagem que segue:
+![dados de professor json](imgs/img23_roteiro.png)
+
+Queremos, portanto, criar uma função javascript que faça uma requisição AJAX, usando fetch(), a este `api/dadosprofessores.php`, e que seja capaz de tratar sua resposta, apresentando os dados na página.
+
+### 3.3. Criação do script js/professores.js
+
+Agora, criaremos um arquivo javacript para tratar dos dados de professores.
+
+Queremos criar uma função que:
+* receba um id de professor;
+* faça uma requisição HTTP para um PHP que responda com um JSON
