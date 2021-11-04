@@ -453,7 +453,7 @@ Queremos alterar o conteúdo da célula (`<td>`) correspondente ao nome do Coord
                 let textcoord = document.createTextNode(curso.coordenador.nome);
                 linkcoord.appendChild(textcoord);
                 linkcoord.setAttribute("href", "#");
-                linkcoord.setAttribute("onclick", "pagProfessor(this)");
+                linkcoord.setAttribute("onclick", "linkProfessor(this)");
                 linkcoord.setAttribute("data-coord", curso.coordenador.id);
                 tdcoord.appendChild(linkcoord);
                 tr.appendChild(tdcoord);
@@ -466,26 +466,40 @@ Descrevendo o código, temos:
 * adiciona o `textcoord` dentro do `linkcoord`, fazendo com que crie algo como `<a>Rafael Speroni</a>`;
 * adiciona um atributo `href="#"` ao `linkcood`, fazendo com que crie algo como `<a href="#">Rafael Speroni</a>`;
 * adiciona um atributo `data-coord` com o valor do id do professor ao `linkcoord`, fazendo com que se crie algo como `<a href="#" data-coord="1">Rafael Speroni</a>`; 
-* adiciona um atributo `onclick="buscaProfessor(this)"`, fazendo com que se crie algo como `<a href="#" data-coord="1" onclick="buscaProfessor(this)">Rafael Speroni</a>`;
+* adiciona um atributo `onclick="linkProfessor(this)"`, fazendo com que se crie algo como `<a href="#" data-coord="1" onclick="linkProfessor(this)">Rafael Speroni</a>`;
 * adiciona o link `linkcoord` à celula `tdcoord`;
 * adiciona a célula `tdcoord` à linha da tabela `<tr>`;
 
-Isto fará com que o nome do professor seja exibido na forma de uma **célula da tabela (td)**, que contém um link **<a>**, que aponta para a própria página **href="#"**, que ao ser clicado chama uma função **buscaProfessor(this)**, e que tem o id do professor armazenado no atributo **data-coord**;
+Isto fará com que o nome do professor seja exibido na forma de uma **célula da tabela (td)**, que contém um link **<a>**, que aponta para a própria página **href="#"**, que ao ser clicado chama uma função **linkProfessor(this)**, e que tem o id do professor armazenado no atributo **data-coord**;
 
 Visualize sua página no navegador, e verifique se os links foram criados. Inspecione o elemento do nome, e verifique se o HTML foi gerado corretamente, conforme exemplo da figura abaixo:
 ![Página com professores com links](imgs/img21_roteiro.png)
 
-Uma vez que tenha criado os links, eles ainda não funcionam. Observe no console javascript que o erro indica que a função `buscaProfessor()` não está definida. De fato, ainda não foi criada.
+Uma vez que tenha criado os links, eles ainda não funcionam. Observe no console javascript que o erro indica que a função `linkProfessor()` não está definida. De fato, ainda não foi criada.
 ![Erro JS - função não definida](imgs/img22_roteiro.png)
 
-### 3.2. Criação do script api/dadosprofessores.php
+
+### 3.2. Criação da função linkProfessor()
+
+Ainda no arquivo `js/cursos;js`, queremos criar esta função que é chamada quando o link for clicado.
+
+```javascript
+function linkProfessor(coord){
+    var id = coord.getAttribute('data-coord');
+    window.location.href = "professor.php?id="+id;
+}
+```
+Observe que ela vai pegar o valor contido em `data-coord`, e utilizá-lo para redirecionar para a página professor.php, com parâmetro id na queryString.
+
+## 4. Criação de um Endpoint para Professores
 
 Este é um arquivo PHP que faz papel de backend. Ao receber uma requisição GET, com um id de professor, retornará um JSON com os dados do referido professor.
 
 Na pasta `api`, crie o `dadosprofessores.php`
 ```php
 <?php
-include('../dados.php'); //para que acesse as funções e os dados
+header('Content-Type: application/json');
+include('../dados.php');
 
 if(isset($_GET['id'])){
     echo json_encode(getProfessor($_GET['id']));
@@ -497,15 +511,227 @@ Neste primeiro momento, o script somente funcionará para os casos em que seja e
 
 Portanto, o que fazemos é testar se há um valor de **id** enviado na **queryString**. Caso afirmativo, chamamos a função `getProfessor()`, que está definida em `dados.php`, e exibimos o seu retorno, codificando em JSON.
 
+Observe que a primeira linha altera o **Content-type**, ou seja, indica que o tipo de conteúdo retornado por esta página não é o padrão (text/html), e sim **application/json**.
+
 Desta forma, se testarmos o acesso direto ao link `http://localhost/..../api/dadosprofessores.php?id=1`, teremos como resposta o JSON com os dados de um professor, tal qual exemplificado na imagem que segue:
 ![dados de professor json](imgs/img23_roteiro.png)
 
-Queremos, portanto, criar uma função javascript que faça uma requisição AJAX, usando fetch(), a este `api/dadosprofessores.php`, e que seja capaz de tratar sua resposta, apresentando os dados na página.
+Queremos, portanto:
+* Alterar a página `professor.php`, de forma que o conteúdo correspondente ao professor esteja vazio, para ser preenchido via AJAX;
 
-### 3.3. Criação do script js/professores.js
+* Criar uma função javascript que faça uma requisição AJAX, usando fetch(), a este `api/dadosprofessores.php`, e que seja capaz de tratar sua resposta, apresentando os dados na página.
+
+### 4.1. Alteração da página professor.php
+
+A página `professor.php` será alterada, de forma q remover aqueles conteúdos de professor que eram gerados pelo PHP. Deseja-se, que este conteúdo venha vazio, e depois seja preenchido pelo javascript, em uma requisição AJAX.
+
+Código da página `professor.php`:
+```php
+<?php
+include ('cabecalho.html');
+?>
+<main class="container">
+    <h2>Dados do Professor</h2>
+    <!-- Aqui serão apresentados os dados do professor -->
+    <dl>
+      <dt id="nomeprofessor"></dt>
+      <dd id="descrprofessor"></dd>
+    </dl>
+
+</main>
+<script src="js/professor.js"></script>
+<?php
+include ('rodape.html');
+?>
+```
+
+Observe que foram removidos os trechos PHP que geravam os conteúdos centrais da página.
+A nova **lista de definição HTML (`<dl>`)**, passa a conter dois elementos, identificados e vazios:
+* `<dt id="nomeprofessor">`: título - onde será adicionado o nome do professor;
+* `<dd id="descrprofessor">`: definição (descrição) - onde serão exibidos detalhes do professor.
+
+Observe, ainda, que há uma indicação de que o script `js/professores.js` será invocado.
+
+### 4.2. Criação do script js/professores.js
 
 Agora, criaremos um arquivo javacript para tratar dos dados de professores.
 
 Queremos criar uma função que:
 * receba um id de professor;
 * faça uma requisição HTTP para um PHP que responda com um JSON
+
+```javascript
+//estas duas linhas fazem com que recuperemos os parâmetros enviados na queryString
+const urlSearchParams = new URLSearchParams(window.location.search);
+const params = Object.fromEntries(urlSearchParams.entries()); //params será um objeto javascript, contendo todos os parâmetros enviados na quueryString
+
+//a função que recebe um id, faz a requisição ao endpoint PHP, recebe o JSON e exibe os dados na página
+function buscaProfessor(idProfessor){
+    var nomeprofessor = document.querySelector("#nomeprofessor");
+    var descrprofessor = document.querySelector("#descrprofessor");
+    fetch('api/dadosprofessores.php?id='+idProfessor)
+        .then(response => {
+            return response.json();
+        })
+        .then(dados => {
+            console.log(dados); //apenas para controle
+            nomeprofessor.innerHTML = dados.nome; //insere conteúdo no elemento
+            descrprofessor.innerHTML = "Para contactar o professor, envie e-mail para "+dados.email; //insere conteúdo no elemento
+        });
+}
+
+//execução principal - ao carregar a página
+window.onload = function(){
+    console.log(params); //exibe os parâmetros no console (apenas para entendimento)
+    buscaProfessor(params.id); //invoca a função, com o id do professor que veio na queryString
+  }
+
+```
+
+## 5. A página curso.html
+
+Agora, a página `curso.php` será alterada, de forma semelhante à que fizemos com `professor.php`. Em outras palavras, teremos um link no nome de cada curso, e uma página irá detalhar este curso.
+
+Para demonstrar que não estamos fazendo o PHP construir o HTML, faremos a alteração da extensão do arquivo, e removeremos dele qualquer menção ao PHP.
+
+### 5.1. Criando links nos nomes dos cursos em cursos.php
+
+De forma semelhante ao que fizemos nos nomes dos professores, queremos transformar os nomes de cursos em links. Estes links devem apontar para a página `cursos.html`, passando o id via queryString.
+
+O arquivo `js/cursos.js` é alterado para a criação do link no nome do curso:
+```javascript
+...
+                let tdnome = document.createElement("td");
+                let linknome = document.createElement("a");
+                let textnome = document.createTextNode(curso.nome);
+                linknome.appendChild(textnome);
+                linknome.setAttribute("onclick", "linkCurso(this)");
+                linknome.setAttribute("data-curso", curso.id);
+                linknome.setAttribute("href", "#");
+                tdnome.appendChild(linknome);
+                tr.appendChild(tdnome);
+...
+```
+Esta alteração é bem semelhante ao que fizemos para exibir o link no nome do professor.
+
+Ainda em `js/cursos.js`, também será necessário criar a função `linkCurso()`, que irá redirecionar para  página `curso.html`:
+```javascript
+function linkCurso(curso){
+    var id = curso.getAttribute('data-curso');
+    window.location.href = "curso.html?id="+id;
+}
+```
+
+### 5.2. Renomeando o arquivo cursos.php
+
+Abra o `curso.php` em seu editor e salve como (Arquivo - Salvar como...  ou  File - Save as...)`curso.html`.
+
+#### 5.1.1. Removendo os trechos PHP
+
+Vamos remover os trechos PHP que fazem include em `cabecalho.html` e `rodape.html`.
+Com isso, será necessário que aqueles conteúdos do cabecalho e rodape sejam colocados como HTML nesta página.
+
+O `curso.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- CSS Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/cursos.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">Escola</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="cursos.php">Cursos</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>        
+    </header>
+    <main class="container">
+        <h2>Dados do Curso</h2>
+        <!-- Aqui serão apresentados os dados do curso -->
+        <dl>
+          <dt id="nomecurso"></dt>
+          <dd id="semcurso"></dd>
+          <dd id="coordcurso"></dd>
+        </dl>
+    </main>
+    <script src="js/curso.js"></script>
+    <script>
+    
+    </script>
+<footer>FOOTER</footer>
+<!-- JavaScript Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+</body>
+</html>
+```
+
+Observe que, agora, trata-se de uma página HTML, e só. Ela contém o cabeçalho, o conteúdo principal e o rodapé.
+
+Foi criada, também, uma **lista de definição HTML (`<dl>`)**, para a exibição dos detalhes do curso, bem como os elementos vazios e identificados para o nome, semestres e coordenador.
+
+### 5.3. O endpoint de cursos
+
+Lembre-se que o arquivo `api/dadoscursos.php` é o responsável, no back-end, por entregar os dados de curso. Vá até ele e verifique que há um teste.
+Se não for enviado um **id** no queryString, retorna os dados de todos os cursos. Se for enviado um **id** no queryString, retorna os dados de um curso.
+
+Isso signfica que este endpoint já está preparado para funcionar caso seja feita uma requisição como `http://localhost/..../api/dadoscursos.php?id=1`, o retorno sserá semelhante ao da figura abaixo:
+![dados de um curso json](imgs/img24_roteiro.png)
+
+Portanto, não há necessidade de modificar este endpoint agora.
+
+### 5.4. O script js/curso
+
+De forma semelhante ao que fizemos em `js/professor.js`, queremos um script `js/curso.js`, onde:
+* recebe os parâmetros do queryString
+* define a função buscaCurso
+* onload: ao carregar a página, invoca a função buscaCurso() com o id passado por parâmetro:
+
+O script `js/curso.js`
+```javascript
+const urlSearchParams = new URLSearchParams(window.location.search);
+const params = Object.fromEntries(urlSearchParams.entries());
+
+function buscaCurso(idCurso){
+    var nomeCurso = document.querySelector("#nomecurso");
+    var semCurso = document.querySelector("#semcurso");
+    var coordCurso = document.querySelector("#coordcurso");
+    fetch('api/dadoscursos.php?id='+idCurso)
+        .then(response => {
+            return response.json();
+        })
+        .then(dados => {
+            console.log(dados);
+            nomeCurso.innerHTML = dados.nome;
+            semCurso.innerHTML = "Duração: " + dados.semestres + " semestres";
+            coordCurso.innerHTML = "Coordenador: " + dados.coordenador.nome;
+
+        });
+}
+
+window.onload = function(){
+    console.log(params);
+    buscaCurso(params.id);
+
+  }
+```
