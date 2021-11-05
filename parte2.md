@@ -1,4 +1,4 @@
- Parte 2
+# Parte 2
 
 Na Parte 1, fizemos uma primeira versão de uma página com conteúdo dinâmico, cujos dados estavam armazenados em Arrays.
 As páginas dinâmicas foram geradas pelo PHP, que construiu o HTML e fez o envio dos conetúdos "prontos" para o cliente.
@@ -217,7 +217,7 @@ function buscaCursos(){
     //funcao que busca os dados em api/cursos.php e monta o HTML na página
 
     //recupera o elemento com id #tabelaCursos, e guarda em uma variável com o mesmo nome
-    let tabelaCursos = document.querySelector(#tabelaCursos);
+    let tabelaCursos = document.querySelector("#tabelaCursos");
 
     fetch('api/dadoscursos.php') //url sendo requisitada
         .then((resposta) => { //pega a resposta no formato json
@@ -226,7 +226,7 @@ function buscaCursos(){
         .then((dados) => {    //aquela resposta contem dados
             dados.forEach(curso => { //para cada curso contido em dados
                 console.log(curso.nome); //exibe o nome do curso no console
-                let textnome = document.createTextNode(curso.nome); //cria um nó de texto
+                let textNome = document.createTextNode(curso.nome); //cria um nó de texto
                 tabelaCursos.appendChild(textNome); //adiciona o nó de texto dentro do elemento #tabelaCursos
             })
         }) 
@@ -694,7 +694,6 @@ Foi criada, também, uma **lista de definição HTML (`<dl>`)**, para a exibiç�
 
 Lembre-se que o arquivo `api/dadoscursos.php` é o responsável, no back-end, por entregar os dados de curso. Vá até ele e verifique que há um teste.
 Se não for enviado um **id** no queryString, retorna os dados de todos os cursos. Se for enviado um **id** no queryString, retorna os dados de um curso.
-
 Isso signfica que este endpoint já está preparado para funcionar caso seja feita uma requisição como `http://localhost/..../api/dadoscursos.php?id=1`, o retorno sserá semelhante ao da figura abaixo:
 ![dados de um curso json](imgs/img24_roteiro.png)
 
@@ -734,4 +733,130 @@ window.onload = function(){
     buscaCurso(params.id);
 
   }
+```
+
+## 6. Apresentando as disciplinas de um curso
+
+Nesta seção, vamos alterar a página `curso.html`, incluindo um conjunto de links, pelos quais poderemos filtrar as disciplinas por semestre.
+
+### 6.1. Criando a lista de links
+
+Pretendemos criar:
+* Uma div para posicionar os links;
+* Uma div para posicionar a lista de disciplinas;
+* Um link para "Todas" as disciplinas;
+* Um link para cada semestre do curso;
+
+Vamos, portanto, criar uma div na página `curso.html`, logo após as informações básicas do curso:
+```html
+...
+        </dl>
+        <div id="links"></div>
+        <div id="disciplinas"></div>
+    </main>
+...    
+```
+
+Criamos duas divs vazias, para que sejam preenchidas pelo Javascript.
+
+Inicialmente, vamos criar uma função javascript para listar os semestres, no arquivo `curso.js`:
+```javascript
+//função que cria um conjunto de links dos semestres para filtrar disciplinas
+function linksSemestres(semestres){
+    let links = document.querySelector("#links");
+    let ul = document.createElement("ul");
+    let li = document.createElement("li");
+    let txt = document.createTextNode("Todos");
+    li.appendChild(txt);
+    ul.appendChild(li);
+    links.appendChild(ul);
+}
+```
+Até o momento, estamos fazendo uma função que:
+* seleciona o elemento #links (a div que foi criada anteriormente);
+* cria um elemento `<ul>` (lista não ordenada);
+* cria um elemento `<li>` (item de lista);
+* cria um texto "Todos";
+* adiciona o texto ao elemento `<li>`;
+* adiciona o elemento `<li>` à lista `<ul>`;
+* adiciona a lista `<ul>` à div #links;
+
+Ainda no arquivo `curso.js`, vamos fazer com que a mesma função que buscou os dados do curso, e que escreveu os dados básicos na página, invoque a nossa função recém criada `linksSemestres()`:
+```javascript
+...
+        .then(dados => {
+            console.log(dados);
+            nomeCurso.innerHTML = dados.nome;
+            semCurso.innerHTML = "Duração: " + dados.semestres + " semestres";
+            coordCurso.innerHTML = "Coordenador: " + dados.coordenador.nome;
+            
+            //invoca a função que vai criar os links
+            linksSemestres(dados.semestres);
+        });
+...
+```
+Ou seja, depois de escrever os dados principais do curso (nome, tempo de conclusão, coordenador), chamamos a função responsável por criar os links de semestres. Até o momento, a função `linkSemestres()` cria apenas um item "Todos".
+
+Acesse a página de um curso, e deverá ter algo como a figura abaixo:
+![texto todos semestres](imgs/img25_roteiro.png)
+
+Dando continuidade, vamos alterar a função `linksSemestres()`, para que gere os textos dos demais semestres. Faremos isso com uma estrutura de repetição (de 1 até o número de semestres):
+```javascript
+//função que cria um conjunto de links dos semestres para filtrar disciplinas
+function linksSemestres(semestres){
+    let links = document.querySelector("#links");
+    let ul = document.createElement("ul");
+    let li = document.createElement("li");
+    let txt = document.createTextNode("Todos");
+    li.appendChild(txt);
+    ul.appendChild(li);
+    //Gera os <li> com 1, 2, 3... semestre
+    for (let i = 1; i <= semestres; i++) {
+        let li = document.createElement("li");
+        let txt = document.createTextNode(i + "o. Semestre");
+        li.appendChild(txt); 
+        ul.appendChild(li);           
+    }
+    links.appendChild(ul);
+}
+```
+
+Com essa estrutura de repetição `for`, estamos criando um elemento `<li>` com um texto para cada um dos numeros de semestre.
+
+![texto div semestres](imgs/img26_roteiro.png)
+
+Vamos adicionar algumas regras de CSS em `css/cursos.css`, para que esta lista `<ul>` seja apresentada com seus itens lado-a-lado.
+
+```css
+//
+#links ul {
+    display: flex;
+}
+
+#links ul li{
+    list-style-type: none;
+    margin: 0 10px;
+}
+```
+Alteramos a exibição do `<ul>` para `flex`, e os `<li>` para que fiquem sem o marcador e acrescentamos uma margem para separar os itens. As alterações deverão fazer com que os itens fiquem conforme a imagem:
+
+![texto div semestres lado-a-lado](imgs/img27_roteiro.png)
+
+Antes de fazermos com que os semestres sejam clicáveis, vamos criar o endpoint (back-end PHP) para gerar dados JSON das disciplinas. E também vamos criar uma função javascript (front-end) para fazer a requisição por esses dados.
+
+**Precisaremos:** 
+
+* No arquivo dados.php, criar uma função para selecionar as disciplinas do Array `$disciplinas`;
+* No arquivo `api/dadosdisciplinas.php`, receber requisições com parâmetros na queryString, e invocar a função que seleciona as disciplinas;
+* No arquivo `js/curso.js`, criar uma função que fará a requisição AJAX, e apresentará os dados das disciplinas na página.
+
+### 6.2. O endpoint de disciplinas
+
+De forma semelhante como fizemos com cursos e professores, vamos criar um endpoint para responder às solicitações por dados de disciplinas.
+
+Criar uma função no arquivo `dados.php`:
+```php
+//função recebe o id do curso e o semestre
+//caso seja passado o semestre 0, mostrar disciplinas de todos os semestres
+
 ```
