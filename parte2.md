@@ -858,5 +858,72 @@ Criar uma função no arquivo `dados.php`:
 ```php
 //função recebe o id do curso e o semestre
 //caso seja passado o semestre 0, mostrar disciplinas de todos os semestres
+function getDisciplinas($id_curso, $semestre){
+    global $disciplinas;
+    //cria um array para as disciplinas selecionadas
+    $discSelecionadas = array();
+    foreach($disciplinas as $disciplina){
+        //testa se é disciplina do curso
+        if ($disciplina['id_curso'] == $id_curso){
+            //se for o semestre informado, ou se informar zero
+            if (($disciplina['semestre'] == $semestre) ||
+                ($semestre == 0)){
+                    //adiciona esta disciplina ao array das selecionadas
+                    array_push($discSelecionadas, $disciplina);
+                }
+        }
+    }
+    //retorna o array criado, contendo as selecionadas
+    return $discSelecionadas;
+}
+```
+Perceba que, nesta função, precisamos criar um novo array, para que pudessemos incluir nele as disciplinas que queremos selecionar.
+O array foi criado vazio (`$discSelecionadas = array()`), e depois, a depender dos testes feitos com os valores, os cursos são adicionados ao array, com a função `array_push()`.
+Ao final, o array gerado é retornado como resultado da função.
+
+Para testá-la, vamos ao endpoint, que será o arquivo que responderá às requisições para revolver os dados.
+
+Queremos criar um endpoint que:
+* Receba parâmetros **id_curso** e **semestre** (via queryString);
+* id_curso será usado para filtrar disciplinas por curso;
+* semestre será usado para filtras as disciplinas por semestre, se vier ZERO, ou não vier o parâmetro semestre, entendemos como ZERO, indicando que são TODAS as disciplinas do curso.
+
+Vamos criar um arquivo `api/dadosdisciplinas.php`:
+
+```php
+<?php
+<?php
+include_once('../dados.php');
+
+if(isset($_GET['id_curso'])){
+    $id_curso = $_GET['id_curso'];
+    if(isset($_GET['semestre'])){
+        $semestre = $_GET['semestre'];
+    }else{
+        $semestre = 0;
+    }
+    $disciplinas = getDisciplinas($id_curso, $semestre);
+    echo json_encode($disciplinas);
+}else{//caso não venha o parâmetro id_curso
+    $msg = array("erro" => "Não é possível acessar");
+    echo json_encode($msg);
+}
+```
+
+Para testar, acesse em seu navegador `http://localhost/...../api/dadosdisciplinas.php`. Como não está enviando o id_curso no queryString, a mensagem retornada é a de erro, que criamos.
+
+Acessando `http://localhost/...../api/dadosdisciplinas.php?id_curso=1`, deverá retornar um JSON contendo dados de todas as disciplinas do curso 1:
+
+![Visualização do resultado do script api/dadosdisciplinas.php](imgs/img28_roteiro.png)
+
+Já acessando `http://localhost/...../api/dadosdisciplinas.php?id_curso=1&semestre=2`, deverá retornar um JSON contendo os dados das disciplinas do semestre 2 do curso 1:
+![Visualização do resultado do script api/dadosdisciplinas.php](imgs/img29_roteiro.png)
+
+### 6.3. A função Javascript que faz a requisição dos dados de disciplina
+
+Nosso objetivo é que a página de detalhes de um curso apresente os dados de suas disciplinas.
+Portanto, vamos criar uma função para fazer a requisição HTTP ao endpoint de disciplinas.
+No arquivo `js/curso.js`:
+```javascript
 
 ```
