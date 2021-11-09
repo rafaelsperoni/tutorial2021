@@ -1040,7 +1040,7 @@ Acessando a página, temos:
 Até o momento, temos a lista de semestres na parte superior do conteúdo, mas ainda não funcionam como links.
 Pretendemos, agora, alterar a função que gera essa lista, de forma que os números de semestres tornem-se links, e sejam apresentados como abas, para que possamos filtrar as disciplinas.
 
-Para a criação de abas, vamos aplicar à lista dos semestres um conjunto de estilos do Bootstrap ([exemplo aqui](https://getbootstrap.com/docs/5.0/components/navs-tabs/#javascript-behavior))
+Para a criação de abas, vamos aplicar à lista dos semestres um conjunto de estilos do Bootstrap ([exemplo aqui](https://getbootstrap.com/docs/5.0/components/navs-tabs/#javascript-behavior)){:target=_blank}
 
 Vamos, então, alterar a função `linksSemestres()`, para que a lista (`<ul>`) seja gerada com os estilos do Bootstrap.
 
