@@ -739,7 +739,7 @@ window.onload = function(){
 
 Nesta seção, vamos alterar a página `curso.html`, incluindo um conjunto de links, pelos quais poderemos filtrar as disciplinas por semestre.
 
-### 6.1. Criando a lista de links
+### 6.1. Criando a lista de links por semestre
 
 Pretendemos criar:
 * Uma div para posicionar os links;
@@ -925,5 +925,173 @@ Nosso objetivo é que a página de detalhes de um curso apresente os dados de su
 Portanto, vamos criar uma função para fazer a requisição HTTP ao endpoint de disciplinas.
 No arquivo `js/curso.js`:
 ```javascript
-
+function listaDisciplinas(id_curso, semestre){
+    //seleciona a div e limpa o seu conteúdo
+    let divDisciplinas = document.querySelector("#disciplinas");
+    divDisciplinas.innerHTML = "";
+    //requisição AJAX
+    fetch("api/dadosdisciplinas.php?id_curso="+id_curso+"&semestre="+semestre)
+    .then(response => {
+        //pega a resposta como json
+        return response.json();
+    })
+    .then(disciplinas => {
+        //exibe no console os dados retornados 
+        console.log(disciplinas);
+    })
+}
 ```
+Até aqui, nossa função vai exibir os dados no console.
+
+Vamos alterar a função javascript `buscaCursos()`, para que a mesma, além de invocar a função que cria os links de semestres, invoque a função `listaDisciplinas()`.
+
+Altere a função `buscaCursos()` em `js/curso.js`, acrescentando:
+```javascript
+...
+    //ainda dentro do .then(dados=> {
+            //invoca a função que cria os links de semestres
+            linksSemestres(dados.id, dados.semestres);
+            //invoca a função que faz requisição das disciplinas
+            //usa o id do curso, e semestre 0 (todos)
+            listaDisciplinas(dados.id, 0);
+...
+```
+Observe em seu console javascript, que os dados resultantes da requisição AJAX para `api/dadosdisciplinas.php` devem ter sido apresentados:
+
+![console com dados de disciplinas](imgs/img30_roteiro.png)
+
+Até o momento, os dados foram retornados, mas não apresentados na página. Logo, vamos fazer com que os mesmos sejam exibidos na página. Para isto, precisamos percorrer (com forEach) os dados das disciplinas, incluindo os mesmos no HTML da página.
+
+Em `js/curso.js`, altere a função `listaDisciplinas()`:
+```javascript
+    ...
+    .then(disciplinas => {
+        //exibe no console os dados retornados 
+        console.log(disciplinas);
+        //percorre o array de disciplinas retornado
+        disciplinas.forEach(disciplina => {
+            //cria uma linha de tabela
+            let tr = document.createElement("tr");
+            //cria uma coluna de tabela
+            let td = document.createElement("td");
+            //cria um nó de texto
+            let txn = document.createTextNode(disciplina.nome);
+            //adiciona o nó de texto na coluna
+            td.appendChild(txn);
+            //adiciona a coluna na linha
+            tr.appendChild(td);
+            //adiciona a linha à div
+            divDisciplinas.appendChild(tr);
+        });
+    ...
+```
+![página com dados de disciplinas](imgs/img31_roteiro.png)
+
+Observe que, para cada disciplina, uma linha e uma coluna de tabela é criada, e adicionada à div selecionada. No HTML, podemos alterar essa div para uma table, e vamos fazê-la com a classe `table-striped`, para que tenhas as linhas com cores alternadas.
+
+Em `curso.html`, vamos alterar:
+```html
+...
+        <div class="tab-content">
+          <div id="links"></div>
+          <table class="table table-striped">
+            <tbody id="disciplinas"></tbody>
+          </table>
+        </div>
+...
+```
+![tabela de disciplinas com cores](imgs/img32_roteiro.png)
+
+Agora, vamos acrescentar mais uma coluna, com a ementa. Altere a função `listaDisciplinas()` em `js/curso.js` e acrescente outra célula (`<td>`) com a ementa (`disciplina.ementa`):
+```javascript
+    ...
+        //percorre o array de disciplinas retornado
+        disciplinas.forEach(disciplina => {
+            //cria uma linha de tabela
+            let tr = document.createElement("tr");
+            //cria uma coluna de tabela
+            let td = document.createElement("td");
+            //cria um nó de texto
+            let txn = document.createTextNode(disciplina.nome);
+            //adiciona o nó de texto na coluna
+            td.appendChild(txn);
+            //adiciona a coluna na linha
+            tr.appendChild(td);
+        /////coluna para a ementa////
+            //cria uma coluna de tabela
+            let tdementa = document.createElement("td");
+            //cria um nó de texto
+            let txnementa = document.createTextNode(disciplina.ementa);
+            //adiciona o nó de texto na coluna
+            tdementa.appendChild(txnementa);
+            //adiciona a coluna na linha
+            tr.appendChild(tdementa);
+        /////////////////////////////
+            //adiciona a linha à div
+            divDisciplinas.appendChild(tr);
+        });
+    ...
+```
+Acessando a página, temos:
+![tabela de disciplinas com ementas](imgs/img33_roteiro.png)
+
+### 6.4. Filtrando as disciplinas por semestre
+
+Até o momento, temos a lista de semestres na parte superior do conteúdo, mas ainda não funcionam como links.
+Pretendemos, agora, alterar a função que gera essa lista, de forma que os números de semestres tornem-se links, e sejam apresentados como abas, para que possamos filtrar as disciplinas.
+
+Para a criação de abas, vamos aplicar à lista dos semestres um conjunto de estilos do Bootstrap ([exemplo aqui](https://getbootstrap.com/docs/5.0/components/navs-tabs/#javascript-behavior))
+
+Vamos, então, alterar a função `linksSemestres()`, para que a lista (`<ul>`) seja gerada com os estilos do Bootstrap.
+
+Em `js/curso.js`, na função `linksSemestres()`:
+```javascript
+//função que cria um conjunto de links dos semestres para filtrar disciplinas
+function linksSemestres(id_curso, semestres){
+    //encontra a div onde será escrita a lista
+    let links = document.querySelector("#links");
+  //criaçao da aba "Todos"  
+    //cria o elemento <ul>
+    let ul = document.createElement("ul");
+    //cria o elemento <li>
+    let li = document.createElement("li");
+    //cria o link <a>
+    let a = document.createElement("a");
+    //acrescenta um atributo class em ul: <ul class="nav nav-tabs>" - são classes do Bootstrap
+    ul.setAttribute('class', 'nav nav-tabs')
+    //acrescenta um atributo data-bs-toggle em <li>: <li data-bs-toggle="tab"> - para o comportamento de alterar a aba selecionada
+    li.setAttribute("data-bs-toggle", "tab")
+    //acrescenta um atributo class em <a>: <a class="nav-link active"> - são classes do Bootstrap (active indica que essa aba vem selecionada)
+    a.setAttribute("class", "nav-link active");
+    //cria um atributo onclick, para invocar a função que busca as disciplinas
+    li.setAttribute("onclick", "listaDisciplinas("+id_curso+", 0)")
+    //cria um nó de texto, contento a palavra "Todos"
+    let txt = document.createTextNode("Todos");
+    //acrescenta o nó de texto ao link <a>
+    a.appendChild(txt);
+    //acrescente o link ao <li>
+    li.appendChild(a);
+    //acrescenta o <li> ao <ul>
+    ul.appendChild(li);
+    //Gera os <li> com 1, 2, 3... semestre
+    //faz a geração dos elementos e estilos tal qual fizemos para "Todos"
+    for (let i = 1; i <= semestres; i++) {
+        let li = document.createElement("li");
+        let a = document.createElement("a");
+        let txt = document.createTextNode(i + "o. Semestre");
+        li.setAttribute('class', 'nav-item');
+        a.setAttribute("class", "nav-link")
+        a.setAttribute("data-bs-toggle", "tab")
+        //adiciona o atributo onclick, para invocar a função que busca as disciplinas
+        li.setAttribute("onclick", "listaDisciplinas("+id_curso+", "+ i +")");
+        a.appendChild(txt); 
+        li.appendChild(a);
+        ul.appendChild(li);           
+    }
+    //adiciona a lista <ul> à div selecionada
+    links.appendChild(ul);
+}
+```
+
+Acessando a página, 
+![links de semestres funcionais](imgs/img34_roteiro.png)
