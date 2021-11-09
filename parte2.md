@@ -1093,5 +1093,10 @@ function linksSemestres(id_curso, semestres){
 }
 ```
 
-Acessando a página, 
+Acessando a página, verifique que as abas foram estilizadas, e os links disparam novas requisições. Além disso, as abas ficam selecionadas, de acordo com a que foi clicada:
 ![links de semestres funcionais](imgs/img34_roteiro.png)
+
+
+Com isso, encerramos a parte 2 deste roteiro.
+A parte 3 necessitará que você tenha chegado até aqui. Nela, passaremos a utilizar um Banco de Dados. Precisaremos alterar as funções que manipulam os dados, e pretendemos que não seja necessário realizar maiores modificações nas páginas.
+Assim, poderemos identificar a importância do entendimento da separação entre front-end e back-end.
