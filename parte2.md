@@ -251,7 +251,7 @@ function buscaCursos(){
     //funcao que busca os dados em api/cursos.php e monta o HTML na página
 
     //recupera o elemento com id #tabelaCursos, e guarda em uma variável com o mesmo nome
-    let tabelaCursos = document.queryString(#tabelaCursos);
+    let tabelaCursos = document.querySelector("#tabela-cursos");
 
     fetch('api/dadoscursos.php') //url sendo requisitada
         .then((resposta) => { //pega a resposta no formato json
