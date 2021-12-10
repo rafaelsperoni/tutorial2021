@@ -436,6 +436,30 @@ Antes, exibiamos `curso.coordenador`. Agora, essa propriedade contém um **Objet
 E, então, a página `cursos.php` será apresentada conforme segue:
 ![Página com professores](imgs/img20_roteiro.png)
 
+### 2.4.2. Alterando a função getCursoPorId()
+
+De forma semelhante ao que fizemos na função `getCursos()`, no `dados.php`, faremos a alteração na função `getCursoPorId()`
+
+A alteração consiste em alterar o valor contido na propriedade `coordenador`, passando a constar ali não apenas o id, mas o array completo do professor.
+
+```php
+function getCursoPorId($id_curso){
+    global $cursos;
+
+    $cursoRetorno = array();
+
+    foreach($cursos as $curso){ //para cada 
+        if($curso['id'] == $id_curso){
+            //substitui o id pelo array do professor retornado
+            $curso['coordenador'] = getProfessor($curso['coordenador']);
+            $cursoRetorno = $curso;
+        }
+    }
+    //retorna o array de curso 
+    return $cursoRetorno;
+}
+```
+
 ## 3. A página de professor.php
 
 Tal qual fizemos com a página que lista os cursos, vamos alterar a página `professor.php`, de forma que o PHP a página seja carregada em sua estrutura básica, e os dados sejam carregados por meio de uma requisição AJAX, usando o `fetch()`.
@@ -699,14 +723,14 @@ Isso signfica que este endpoint já está preparado para funcionar caso seja fei
 
 Portanto, não há necessidade de modificar este endpoint agora.
 
-### 5.4. O script js/curso
+### 5.4. O script js/curso.js
 
-De forma semelhante ao que fizemos em `js/professor.js`, queremos um script `js/curso.js`, onde:
+De forma semelhante ao que fizemos em `js/professor.js`, queremos criar um script `js/curso.js`, onde:
 * recebe os parâmetros do queryString
 * define a função buscaCurso
 * onload: ao carregar a página, invoca a função buscaCurso() com o id passado por parâmetro:
 
-O script `js/curso.js`
+Crie o script `js/curso.js`
 ```javascript
 const urlSearchParams = new URLSearchParams(window.location.search);
 const params = Object.fromEntries(urlSearchParams.entries());
@@ -826,6 +850,8 @@ Com essa estrutura de repetição `for`, estamos criando um elemento `<li>` com 
 ![texto div semestres](imgs/img26_roteiro.png)
 
 Vamos adicionar algumas regras de CSS em `css/cursos.css`, para que esta lista `<ul>` seja apresentada com seus itens lado-a-lado.
+
+Crie a pasta `css`. Dentro dela, crie o arquivo `cursos.css`:
 
 ```css
 //
