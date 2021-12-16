@@ -21,8 +21,8 @@ Verifique o material da aula sobre JSON no SIGAA.
 
 ### 1.2 Criando o "endpoint" PHP que retornará dados de curso em JSON
 
-Na pasta do seu projeto, crie uma pasta chamada **api**, e, dentro desta, um arquivo chamado `cursos.php`.
-O script `cursos.php` será responsável por obter os dados de UM ou de TODOS OS CURSOS, e retornar os dados em formato JSON. Veja que, agora, não queremos retornar um HTML.
+Na pasta do seu projeto, crie uma pasta chamada **api**, e, dentro desta, um arquivo chamado `dadoscursos.php`.
+O script `dadoscursos.php` será responsável por obter os dados de UM ou de TODOS OS CURSOS, e retornar os dados em formato JSON. Veja que, agora, não queremos retornar um HTML.
 
 Conteúdo do arquivo `api/dadoscursos.php`
 ```php
