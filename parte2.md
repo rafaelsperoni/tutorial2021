@@ -574,9 +574,9 @@ A nova **lista de definição HTML (`<dl>`)**, passa a conter dois elementos, id
 * `<dt id="nomeprofessor">`: título - onde será adicionado o nome do professor;
 * `<dd id="descrprofessor">`: definição (descrição) - onde serão exibidos detalhes do professor.
 
-Observe, ainda, que há uma indicação de que o script `js/professores.js` será invocado.
+Observe, ainda, que há uma indicação de que o script `js/professor.js` será invocado.
 
-### 4.2. Criação do script js/professores.js
+### 4.2. Criação do script js/professor.js
 
 Agora, criaremos um arquivo javacript para tratar dos dados de professores.
 

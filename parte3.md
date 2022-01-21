@@ -408,3 +408,76 @@ Observe que já fizemos com que o array retornado pela função já contenha tod
 Verifique o acesso direto ao endpoint de cursos `http://localhost/...../api/dadoscursos.php?id=1`, que irá invocar a função `getCursoPorId(1)`: 
 
 ![api/dadoscursos.php?id=1 buscando do BD](imgs/img46_roteiro.png)
+
+
+#### 3.5.5.1 - Lista de Disciplinas (ATUALIZAÇÃO JAN/2022)
+
+Por fim, para a finalização da Parte 3 deste roteiro, precisamos fazer as alterações para que as disciplinas sejam trazidas do Banco de Dados, em vez do Array.
+
+Assim, faremos:
+1. Alteração do api/dadosdisciplinas.php:
+  - Substituição da origem dos dados e das funções (sai o "dados.php" e entra o "conexao.php");
+2. Criação de função de recuperação dos dados de disciplina, com a mesma assinatura (nome de função e parâmetros) daquela que eram utilizada para retornar dados do Array.
+
+##### 3.5.5.1.1 - Alteração da Fonte dos dados em api/dadosdisciplinas.php
+
+Da mesma forma como fizemos com os demais endpoints, vamos alterar o `api/dadosdisciplinas.php`, para que os dados sejam recuperados do Banco de Dados, e não mais do Array. Para isto, removeremos a chamada ao arquivo `../dados.php`, e incluiremos a chamada ao arquivo `conexao.php`.
+
+Em `api/dadosdisciplinas.php`:
+
+```php
+<?php
+require_once('conexao.php');
+```
+
+Com essa alteração, observe que a página `curso.html` não apresenta mais as disciplinas daquele curso. O que faz sentido, uma vez que a função responsável por buscar disciplinas no Banco de Dados ainda não foi criada.
+
+![Erro na busca por disciplinas - função não existe](imgs/img51_roteiro.png)
+
+Na imagem, podemos observar que a requisição para `api/dadosdisciplinas.php` é feita, mas a mesma retorna um erro, indicando que a função `getDisciplinas()` não foi encontrada. Portanto, não é possível obter os dados das disciplinas.
+
+##### 3.5.5.1.2 - Criação da função getDisciplinas()
+
+Esta função recebe o id do curso e o semestre.
+Faz uma consulta ao Banco de Dados, na tabela **disciplina**.
+Retorna um array com as disciplinas correspondentes.
+
+Um detalhe importante: Na função anterior, havíamos considerado que, quando passado o semestre 0 para o parâmetro, queremos TODAS as disciplinas do curso. Dessa forma, a função deverá considerar isso, também, para realizar a consulta.
+
+No arquivo `conexao.php`, crie a função:
+```php
+function getDisciplinas($id_curso, $semestre){
+    global $conexao; 
+    if ($semestre == 0){ //não filtrar por semestre
+        //prepara a consulta com parametro :id_curso e :semestre
+        $resultado = $conexao->prepare("select * from disciplina where id_curso=:id_curso"); 
+    }else{ //filtrar tambem por semestre
+        //prepara a consulta com parametro :id_curso e :semestre
+        $resultado = $conexao->prepare("select * from disciplina where id_curso=:id_curso and semestre=:semestre"); 
+
+        //vinculo valor ao semestre - o valor q chega de entrada na fcao
+        $resultado->bindParam(':semestre', $semestre);
+    }    
+    //vinculo valor ao id - o valor q chega de entrada na fcao
+    $resultado->bindParam(':id_curso', $id_curso);
+    //executar uma consulta
+    $resultado->execute();
+
+    //transformar o resultado em array
+    $disciplinas = $resultado->fetchAll(PDO::FETCH_ASSOC);
+    //recupera os dados do coordenador e guarda no array
+    return $disciplinas;
+}
+```
+
+Acessando a página, agora, podemos ver as disciplinas listadas, bem como a requisição ao `api/dadosdisciplinas.php`, com o JSON de resposta, no inspector.
+
+![Disciplinas retornadas do Banco de Dados](imgs/img52_roteiro.png).
+
+## 3.6 - FIM DA PARTE 3
+
+Chegamos ao fim da parte 3 do Roteiro.
+
+Estou trabalhando em uma parte 4, na qual pretendo deixar, como referência, um CRUD (CREATE, READ, UPDATE, DELETE) em funcionamento, ou seja, as funcionalidades de um Cadastro de Curso.
+
+Este CRUD NÃO SERÁ COBRADO PARA ENTREGA.
